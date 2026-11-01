@@ -45,6 +45,32 @@ static int g_bmpHeight = 0;
 static void LoadRealDwmapi(void)
 {
     if (g_realDwmapi) return;
+
+    wchar_t dirPath[MAX_PATH];
+    if (GetModuleFileNameW(g_hModule, dirPath, MAX_PATH) || GetModuleFileNameW(NULL, dirPath, MAX_PATH))
+    {
+        wchar_t* lastSlash = wcsrchr(dirPath, L'\\');
+        if (lastSlash) *(lastSlash + 1) = L'\0';
+
+        wchar_t chainUe4ss[MAX_PATH];
+        wcscpy_s(chainUe4ss, MAX_PATH, dirPath);
+        wcscat_s(chainUe4ss, MAX_PATH, L"dwmapi_ue4ss.dll");
+        if (GetFileAttributesW(chainUe4ss) != INVALID_FILE_ATTRIBUTES)
+        {
+            g_realDwmapi = LoadLibraryW(chainUe4ss);
+            if (g_realDwmapi) return;
+        }
+
+        wchar_t chainGeneric[MAX_PATH];
+        wcscpy_s(chainGeneric, MAX_PATH, dirPath);
+        wcscat_s(chainGeneric, MAX_PATH, L"dwmapi_chain.dll");
+        if (GetFileAttributesW(chainGeneric) != INVALID_FILE_ATTRIBUTES)
+        {
+            g_realDwmapi = LoadLibraryW(chainGeneric);
+            if (g_realDwmapi) return;
+        }
+    }
+
     wchar_t sysPath[MAX_PATH];
     if (GetSystemDirectoryW(sysPath, MAX_PATH))
     {
@@ -197,6 +223,21 @@ static void LoadConfig(void)
     if (lastSlash) *(lastSlash + 1) = L'\0';
     wcscat_s(iniPath, MAX_PATH, L"turbo_config.ini");
 
+    if (GetFileAttributesW(iniPath) == INVALID_FILE_ATTRIBUTES)
+    {
+        wchar_t exePath[MAX_PATH];
+        if (GetModuleFileNameW(NULL, exePath, MAX_PATH))
+        {
+            wchar_t* exeSlash = wcsrchr(exePath, L'\\');
+            if (exeSlash) *(exeSlash + 1) = L'\0';
+            wcscat_s(exePath, MAX_PATH, L"turbo_config.ini");
+            if (GetFileAttributesW(exePath) != INVALID_FILE_ATTRIBUTES)
+            {
+                wcscpy_s(iniPath, MAX_PATH, exePath);
+            }
+        }
+    }
+
     wchar_t buf[128];
     GetPrivateProfileStringW(L"TurboMode", L"SpeedMultiplier", L"2.5", buf, 128, iniPath);
     double val = _wtof(buf);
@@ -254,6 +295,19 @@ static void InitOSD(void)
     wcscat_s(assetPath, MAX_PATH, L"assets\\indicator.png");
 
     Bitmap* bmp = Bitmap::FromFile(assetPath);
+    if (!bmp || bmp->GetLastStatus() != Ok)
+    {
+        if (bmp) delete bmp;
+        wchar_t exePath[MAX_PATH];
+        if (GetModuleFileNameW(NULL, exePath, MAX_PATH))
+        {
+            wchar_t* exeSlash = wcsrchr(exePath, L'\\');
+            if (exeSlash) *(exeSlash + 1) = L'\0';
+            wcscat_s(exePath, MAX_PATH, L"assets\\indicator.png");
+            bmp = Bitmap::FromFile(exePath);
+        }
+    }
+
     if (bmp && bmp->GetLastStatus() == Ok)
     {
         g_bmpWidth = bmp->GetWidth();
@@ -301,17 +355,33 @@ static void UpdateOSDPosition(void)
     if (!g_hwndGame || !IsWindow(g_hwndGame))
     {
         g_hwndGame = GetGameWindow();
-        if (!g_hwndGame) return;
     }
 
-    RECT rcClient;
-    GetClientRect(g_hwndGame, &rcClient);
-    POINT ptClient = { rcClient.left, rcClient.top };
-    ClientToScreen(g_hwndGame, &ptClient);
+    int clientW = 1920;
+    int clientH = 1080;
+    POINT ptClient = { 0, 0 };
 
-    int clientW = rcClient.right - rcClient.left;
-    int clientH = rcClient.bottom - rcClient.top;
-    if (clientW <= 0 || clientH <= 0) return;
+    if (g_hwndGame && IsWindow(g_hwndGame))
+    {
+        RECT rcClient;
+        GetClientRect(g_hwndGame, &rcClient);
+        ptClient.x = rcClient.left;
+        ptClient.y = rcClient.top;
+        ClientToScreen(g_hwndGame, &ptClient);
+
+        int w = rcClient.right - rcClient.left;
+        int h = rcClient.bottom - rcClient.top;
+        if (w > 400 && h > 300)
+        {
+            clientW = w;
+            clientH = h;
+        }
+    }
+    else
+    {
+        clientW = GetSystemMetrics(SM_CXSCREEN);
+        clientH = GetSystemMetrics(SM_CYSCREEN);
+    }
 
     int posX = ptClient.x + (int)(clientW * 0.708333);
     int posY = ptClient.y + (int)(clientH * 0.035185);
@@ -420,6 +490,7 @@ static DWORD WINAPI InputListenerThread(LPVOID lpParam)
 
 static void InitializeHooks(void)
 {
+    LoadRealDwmapi();
     LoadConfig();
     if (MH_Initialize() == MH_OK)
     {

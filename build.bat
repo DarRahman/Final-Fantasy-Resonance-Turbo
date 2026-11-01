@@ -12,7 +12,7 @@ if errorlevel 1 (
 )
 
 echo Compiling FFRS-Turbo dwmapi.dll...
-%CXX% -shared -O2 -o dwmapi.dll src/main.cpp buffer.o hook.o trampoline.o hde64.o -Iminhook/include -lgdiplus -lgdi32 -static-libgcc -static-libstdc++ -s
+%CXX% -shared -O2 -static -o dwmapi.dll src/main.cpp buffer.o hook.o trampoline.o hde64.o -Iminhook/include -lgdiplus -lgdi32 -s
 if errorlevel 1 (
     echo dwmapi.dll build failed.
     del *.o >nul 2>&1

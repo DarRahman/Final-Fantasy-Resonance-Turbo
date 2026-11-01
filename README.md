@@ -1,6 +1,6 @@
 # Final Fantasy Resonance Turbo
 
-[![Release](https://img.shields.io/badge/release-v1.0.0-blue?style=flat-square&logo=github)](https://github.com/DarRahman/Final-Fantasy-Resonance-Turbo/releases)
+[![Release](https://img.shields.io/badge/release-v1.0.1-blue?style=flat-square&logo=github)](https://github.com/DarRahman/Final-Fantasy-Resonance-Turbo/releases)
 [![Platform](https://img.shields.io/badge/platform-Windows%20x64-0078D6?style=flat-square&logo=windows)](#installation)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
@@ -64,6 +64,13 @@ You can toggle it on or off anytime with a single tap of **RT** on your controll
 5. Launch the game through Steam.
 
 *Note: This mod modifies 0 bytes of original game files on disk. To uninstall, simply delete `dwmapi.dll`, `turbo_config.ini`, and `assets/` from that folder.*
+
+### Using alongside UE4SS?
+If you have UE4SS installed (for mods like Fast Travel or Auto-Battle):
+1. In `FFRS\Binaries\Win64\`, rename UE4SS's original `dwmapi.dll` to: `dwmapi_ue4ss.dll`
+2. Extract this mod's files into that same folder.
+
+FFRS Turbo will automatically detect `dwmapi_ue4ss.dll` on game launch and load both mods together.
 
 ### Steam Deck & Linux (Proton)
 Add this to the game's **Launch Options** in Steam:
