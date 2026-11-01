@@ -1,0 +1,35 @@
+# Build artifacts
+*.o
+*.obj
+*.exe
+*.dll
+*.log
+turbo_log.txt
+
+# Intermediate working folders
+savedata_backup/
+draft_video/
+draft_video_new/
+remotion_exact/
+remotion_render/
+cuts_verified/
+video_samples/
+*.zip
+
+# Unused trial images
+trails_*.jpg
+asset_*.png
+consistent_*.jpg
+mockup_*.jpg
+preview_*_harmonious.jpg
+preview_pill.jpg
+preview_quest_fade_comparison.jpg
+preview_seamless_fade.jpg
+test_smoothstep_field.jpg
+indicator_*.png
+label_*.png
+DEVELOPMENT.md
+RELEASE_README.md
+/Final_Showcase_Demo.mp4
+assets/comparison_indicator_alignment.png
+NEXUS_UPLOAD_GUIDE.txt
