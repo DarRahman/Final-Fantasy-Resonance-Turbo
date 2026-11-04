@@ -40,7 +40,13 @@ assets/nexus_cover_gemini.jpg
 assets/nexus_preview_battle.jpg
 assets/nexus_preview_field.jpg
 assets/indicator_cyan.png
-assets/nexus_cover_gemini.jpg
-assets/nexus_preview_battle.jpg
-assets/nexus_preview_field.jpg
-assets/indicator_cyan.png
+NEXUS_FULL_DESCRIPTION_*.txt
+NEXUS_UPLOAD_GUIDE*.txt
+*.mp4
+*.jpg
+assets/backup_toasts_*/
+assets/toasts_*/
+assets/comparison_*.png
+assets/mockup_*.png
+assets/preview_*.png
+assets/nexus_*.jpg
